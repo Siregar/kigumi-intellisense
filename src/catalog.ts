@@ -58,25 +58,19 @@ export class Catalog {
   }
 
   static load(extensionPath: string): Catalog {
-    const utilitiesPath = path.join(extensionPath, 'src', 'data', 'wa-utilities.json');
-    const tokensPath = path.join(extensionPath, 'src', 'data', 'wa-tokens.json');
-
-    // Also check in out/ for packaged extensions
-    const utilitiesPathAlt = path.join(extensionPath, 'out', 'data', 'wa-utilities.json');
-    const tokensPathAlt = path.join(extensionPath, 'out', 'data', 'wa-tokens.json');
+    const dataDir = path.join(extensionPath, 'out', 'data');
+    const utilitiesPath = path.join(dataDir, 'wa-utilities.json');
+    const tokensPath = path.join(dataDir, 'wa-tokens.json');
 
     let utilities: UtilityEntry[] = [];
     let tokens: TokenEntry[] = [];
 
-    const uPath = fs.existsSync(utilitiesPath) ? utilitiesPath : utilitiesPathAlt;
-    const tPath = fs.existsSync(tokensPath) ? tokensPath : tokensPathAlt;
-
-    if (fs.existsSync(uPath)) {
-      utilities = JSON.parse(fs.readFileSync(uPath, 'utf-8'));
+    if (fs.existsSync(utilitiesPath)) {
+      utilities = JSON.parse(fs.readFileSync(utilitiesPath, 'utf-8'));
     }
 
-    if (fs.existsSync(tPath)) {
-      tokens = JSON.parse(fs.readFileSync(tPath, 'utf-8'));
+    if (fs.existsSync(tokensPath)) {
+      tokens = JSON.parse(fs.readFileSync(tokensPath, 'utf-8'));
     }
 
     return new Catalog(utilities, tokens);

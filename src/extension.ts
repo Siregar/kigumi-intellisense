@@ -9,29 +9,38 @@ const MARKUP_LANGUAGES = [
   'html',
   'typescriptreact',
   'javascriptreact',
+  'typescript',
+  'javascript',
   'vue',
-  'svelte',
-  'astro',
-  'php',
-  'erb',
 ];
 
-const STYLE_LANGUAGES = ['css', 'scss', 'less', 'vue', 'svelte', 'astro'];
+const STYLE_LANGUAGES = ['css', 'scss', 'less'];
 
 export function activate(context: vscode.ExtensionContext) {
+  const output = vscode.window.createOutputChannel('Kigumi IntelliSense');
   const config = vscode.workspace.getConfiguration('kigumi');
 
   if (!config.get<boolean>('enable', true)) {
+    output.appendLine('Extension disabled via kigumi.enable setting');
     return;
   }
 
   const catalog = Catalog.load(context.extensionPath);
+  output.appendLine(`Data path: ${context.extensionPath}/out/data/`);
+  output.appendLine(`Loaded: ${catalog.utilities.length} utilities, ${catalog.tokens.length} tokens`);
 
   if (catalog.utilities.length === 0 && catalog.tokens.length === 0) {
-    vscode.window.showWarningMessage(
-      'Kigumi IntelliSense: No data catalogs found. Run `pnpm generate` to build them.'
-    );
-    return;
+    vscode.window
+      .showErrorMessage(
+        'Kigumi IntelliSense: No data catalogs found.',
+        'Run pnpm generate'
+      )
+      .then((action) => {
+        if (action) {
+          output.show();
+        }
+      });
+    output.appendLine('ERROR: No catalogs found. Run `pnpm generate` then `pnpm compile` to build them.');
   }
 
   const classAttributes = config.get<string[]>('classAttributes', ['class', 'className']);
@@ -43,7 +52,7 @@ export function activate(context: vscode.ExtensionContext) {
       vscode.languages.registerCompletionItemProvider(
         { language: lang, scheme: 'file' },
         classCompletion,
-        '-' // Trigger on hyphen for wa- prefix
+        '-', '"', "'", ' ' // Trigger on hyphen, quotes (attr open), space (next class)
       )
     );
   }
@@ -76,9 +85,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  console.log(
-    `Kigumi IntelliSense activated: ${catalog.utilities.length} utilities, ${catalog.tokens.length} tokens`
-  );
+  output.appendLine('Providers registered successfully');
 }
 
 export function deactivate() {

@@ -12,23 +12,48 @@ export function detectClassContext(
 ): string | null {
   const lineText = document.lineAt(position).text;
   const charPos = position.character;
-
-  // Build pattern: (class|className)=["']{value...cursor}
-  const attrPattern = classAttributes.map(escapeRegex).join('|');
-  const re = new RegExp(`(?:${attrPattern})\\s*=\\s*["']([^"']*)$`);
-
-  // Look at text from line start up to cursor
   const textBeforeCursor = lineText.slice(0, charPos);
-  const match = re.exec(textBeforeCursor);
 
-  if (!match) return null;
+  // Build pattern for attribute names
+  const attrPattern = classAttributes.map(escapeRegex).join('|');
 
-  // The attribute value text before the cursor
-  const valueBeforeCursor = match[1];
+  // Strategy 1: Same-line match: className="value..."
+  const sameLineRe = new RegExp(`(?:${attrPattern})\\s*=\\s*["']([^"']*)$`);
+  const sameLineMatch = sameLineRe.exec(textBeforeCursor);
+  if (sameLineMatch) {
+    const valueBeforeCursor = sameLineMatch[1];
+    const lastSpace = valueBeforeCursor.lastIndexOf(' ');
+    return valueBeforeCursor.slice(lastSpace + 1);
+  }
 
-  // Extract the last class name (after the last space)
-  const lastSpace = valueBeforeCursor.lastIndexOf(' ');
-  return valueBeforeCursor.slice(lastSpace + 1);
+  // Strategy 2: Same-line JSX expression: className={`value...`} or className={'value...'}
+  const jsxExprRe = new RegExp(`(?:${attrPattern})\\s*=\\s*\\{[\`'"]([^}\`'"]*?)$`);
+  const jsxMatch = jsxExprRe.exec(textBeforeCursor);
+  if (jsxMatch) {
+    const valueBeforeCursor = jsxMatch[1];
+    const lastSpace = valueBeforeCursor.lastIndexOf(' ');
+    return valueBeforeCursor.slice(lastSpace + 1);
+  }
+
+  // Strategy 3: Multi-line - scan backward to find opening class attribute
+  // Handles cases where className=" is on a previous line
+  const maxScanLines = 5;
+  const startLine = Math.max(0, position.line - maxScanLines);
+  let combined = '';
+  for (let i = startLine; i <= position.line; i++) {
+    const line = i === position.line ? textBeforeCursor : document.lineAt(i).text;
+    combined += (i === position.line ? line : line + ' ');
+  }
+
+  const multiLineRe = new RegExp(`(?:${attrPattern})\\s*=\\s*["']([^"']*)$`);
+  const multiLineMatch = multiLineRe.exec(combined);
+  if (multiLineMatch) {
+    const valueBeforeCursor = multiLineMatch[1];
+    const lastSpace = valueBeforeCursor.lastIndexOf(' ');
+    return valueBeforeCursor.slice(lastSpace + 1);
+  }
+
+  return null;
 }
 
 /**

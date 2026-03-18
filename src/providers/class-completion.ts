@@ -23,9 +23,9 @@ export class ClassCompletionProvider implements vscode.CompletionItemProvider {
     const entries = this.catalog.filterUtilities(prefix);
 
     return entries.map((entry, idx) => {
-      const item = new vscode.CompletionItem(entry.name, vscode.CompletionItemKind.Value);
+      const item = new vscode.CompletionItem(entry.name, vscode.CompletionItemKind.Constant);
 
-      item.detail = entry.category;
+      item.detail = `wa: ${entry.category}`;
 
       // CSS preview as documentation
       const docs = new vscode.MarkdownString();
@@ -38,8 +38,14 @@ export class ClassCompletionProvider implements vscode.CompletionItemProvider {
       }
       item.documentation = docs;
 
-      // Sort by category then name for grouped ordering
-      item.sortText = `${entry.category.padEnd(20)}${String(idx).padStart(4, '0')}`;
+      // Sort above other suggestions: leading space pushes to top
+      item.sortText = ` ${entry.category.padEnd(20)}${String(idx).padStart(4, '0')}`;
+
+      // Preselect first item so wa- suggestions are prominent
+      if (idx === 0) item.preselect = true;
+
+      // filterText ensures typing "wa-gap" matches even if other providers compete
+      item.filterText = entry.name;
 
       // Replace only the current partial class name
       if (prefix.length > 0) {
