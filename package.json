@@ -2,9 +2,11 @@
   "name": "kigumi-intellisense",
   "displayName": "Kigumi IntelliSense",
   "description": "CSS class name and custom property IntelliSense for Web Awesome",
+  "Author": "Michael Suzuki",
+  "website": "https://kigumi.style",
   "publisher": "kigumi",
   "version": "0.1.0",
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE.md",
   "repository": "https://github.com/Siregar/kigumi-intellisense",
   "engines": {
     "vscode": "^1.85.0"
@@ -13,13 +15,22 @@
     "Other"
   ],
   "keywords": [
-    "web-awesome",
     "kigumi",
-    "css",
+    "webawesome",
     "intellisense",
     "autocomplete"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onLanguage:html",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:javascript",
+    "onLanguage:vue",
+    "onLanguage:css",
+    "onLanguage:scss",
+    "onLanguage:less"
+  ],
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
@@ -44,9 +55,10 @@
     "generate:utilities": "tsx scripts/parse-utility-classes.ts",
     "generate:tokens": "tsx scripts/parse-css-tokens.ts",
     "generate": "pnpm generate:utilities && pnpm generate:tokens",
-    "compile": "tsc -p ./",
+    "copy-data": "mkdir -p out/data && cp src/data/*.json out/data/",
+    "compile": "tsc -p ./ && pnpm copy-data",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package",
+    "package": "pnpm compile && vsce package --no-dependencies",
     "publish": "vsce publish"
   },
   "devDependencies": {
@@ -55,5 +67,6 @@
     "@vscode/vsce": "^3.0.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3"
-  }
+  },
+  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
 }

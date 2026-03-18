@@ -1,73 +1,57 @@
 # Kigumi IntelliSense
 
-CSS class name and custom property IntelliSense for [Web Awesome](https://webawesome.com).
+Autocomplete and hover previews for [Web Awesome](https://webawesome.com) CSS classes and design tokens.
 
 ## Features
 
-### Class Name Completion
+### Class Name Completions
 
-Autocomplete for Web Awesome utility classes inside `class` and `className` attributes.
+Autocomplete for `wa-*` utility classes inside `class` and `className` attributes. Start typing and matching classes appear instantly.
 
 ```html
 <div class="wa-stack wa-gap-m">
-<!--                   ↑ autocomplete triggers here -->
+<!--                   ^ completions for wa-gap-* -->
 ```
 
-Supports: HTML, React (TSX/JSX), Vue, Svelte, Astro, PHP
+```tsx
+<WaCard className="wa-padding-l wa-text-center">
+<!--                               ^ completions for wa-text-* -->
+```
 
-### CSS Token Completion
+### CSS Token Completions
 
-Autocomplete for `--wa-*` CSS custom properties inside `var()` expressions.
+Autocomplete for `--wa-*` CSS custom properties inside `var()` expressions. Includes token descriptions and resolved values.
 
 ```css
 .my-component {
   color: var(--wa-color-text-normal);
-  /*                ↑ autocomplete triggers here */
+  /*                ^ completions for --wa-color-* */
 }
 ```
 
-Supports: CSS, SCSS, Less, Vue, Svelte, Astro
-
 ### Hover Previews
 
-Hover over any `wa-*` class name or `--wa-*` token to see its CSS declarations and resolved value.
+Hover over any `wa-*` class name to see its CSS declarations, or any `--wa-*` token to see its resolved value.
+
+## Supported Languages
+
+| Type   | Languages                                    |
+|--------|----------------------------------------------|
+| Markup | HTML, TypeScript, JavaScript, React (TSX/JSX), Vue |
+| Styles | CSS, SCSS, Less                              |
 
 ## Configuration
 
-| Setting                  | Default                    | Description                              |
-|--------------------------|----------------------------|------------------------------------------|
-| `kigumi.enable`          | `true`                     | Enable/disable the extension             |
-| `kigumi.classAttributes` | `["class", "className"]`   | Attribute names to provide completions for |
+| Setting                  | Default                  | Description                                |
+|--------------------------|--------------------------|--------------------------------------------|
+| `kigumi.enable`          | `true`                   | Enable or disable the extension            |
+| `kigumi.classAttributes` | `["class", "className"]` | Attribute names to provide completions for |
 
-## Development
+## Requirements
 
-```bash
-# Install dependencies
-pnpm install
-
-# Generate data catalogs from Web Awesome CSS
-pnpm generate
-
-# Compile TypeScript
-pnpm compile
-
-# Launch Extension Development Host
-# Press F5 in VS Code
-
-# Package for distribution
-pnpm package
-```
-
-## Updating Web Awesome Data
-
-When a new version of Web Awesome is released:
-
-```bash
-pnpm update @awesome.me/webawesome-pro
-pnpm generate
-pnpm compile
-```
+- [Web Awesome](https://webawesome.com) CSS loaded in your project
+- Works best with the [Kigumi CLI](https://kigumi.style) for generating component wrappers
 
 ## License
 
-MIT
+See [LICENSE.md](LICENSE.md).
