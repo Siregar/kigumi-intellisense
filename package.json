@@ -1,0 +1,59 @@
+{
+  "name": "kigumi-intellisense",
+  "displayName": "Kigumi IntelliSense",
+  "description": "CSS class name and custom property IntelliSense for Web Awesome",
+  "publisher": "kigumi",
+  "version": "0.1.0",
+  "license": "MIT",
+  "repository": "https://github.com/Siregar/kigumi-intellisense",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "web-awesome",
+    "kigumi",
+    "css",
+    "intellisense",
+    "autocomplete"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Kigumi IntelliSense",
+      "properties": {
+        "kigumi.classAttributes": {
+          "type": "array",
+          "default": [
+            "class",
+            "className"
+          ],
+          "description": "Attribute names to provide class completions for"
+        },
+        "kigumi.enable": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    }
+  },
+  "scripts": {
+    "generate:utilities": "tsx scripts/parse-utility-classes.ts",
+    "generate:tokens": "tsx scripts/parse-css-tokens.ts",
+    "generate": "pnpm generate:utilities && pnpm generate:tokens",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
