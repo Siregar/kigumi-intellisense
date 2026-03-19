@@ -122,12 +122,12 @@ export function detectTokenContext(
   const charPos = position.character;
   const textBeforeCursor = lineText.slice(0, charPos);
 
-  // Look for var( with optional --wa- prefix
-  const match = /var\(\s*(--wa-[a-z0-9-]*)$/.exec(textBeforeCursor);
+  // Look for var( with any custom property prefix (--)
+  const match = /var\(\s*(--[a-zA-Z0-9-]*)$/.exec(textBeforeCursor);
   if (match) return match[1];
 
-  // Also match bare --wa- in property declarations (e.g. in :root blocks)
-  const bareMatch = /:\s*(--wa-[a-z0-9-]*)$/.exec(textBeforeCursor);
+  // Also match bare -- in property declarations (e.g. in :root blocks)
+  const bareMatch = /:\s*(--[a-zA-Z0-9-]*)$/.exec(textBeforeCursor);
   if (bareMatch) return bareMatch[1];
 
   return null;
@@ -143,8 +143,8 @@ export function detectTokenAtCursor(
   const lineText = document.lineAt(position).text;
   const charPos = position.character;
 
-  // Find --wa-* token at cursor position
-  const re = /--wa-[a-z0-9-]+/g;
+  // Find any custom property (--*) at cursor position
+  const re = /--[a-zA-Z0-9-]+/g;
   let match: RegExpExecArray | null;
   while ((match = re.exec(lineText)) !== null) {
     const start = match.index;

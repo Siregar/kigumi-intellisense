@@ -48,6 +48,14 @@
         "kigumi.enable": {
           "type": "boolean",
           "default": true
+        },
+        "kigumi.customTokenFiles": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "description": "Glob patterns for CSS files containing custom properties to include in IntelliSense (e.g. [\"**/theme.css\", \"src/styles/variables.css\"])"
         }
       }
     }
@@ -67,7 +75,8 @@
     "@types/vscode": "^1.85.0",
     "@vscode/vsce": "^3.0.0",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.1.0"
   },
   "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
 }

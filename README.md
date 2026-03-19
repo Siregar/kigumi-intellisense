@@ -38,9 +38,37 @@ Type `--wa-` inside `var()` to get token completions with resolved values.
 }
 ```
 
+### Custom CSS Properties
+
+Bring your own design tokens into IntelliSense by pointing the extension at your CSS files. Any CSS custom properties (`--*`) declared in those files will appear in `var()` completions and hover previews — across both style and markup files.
+
+```jsonc
+// .vscode/settings.json
+{
+  "kigumi.customTokenFiles": [
+    "**/theme.css",
+    "src/styles/variables.css"
+  ]
+}
+```
+
+Given a `theme.css` like:
+
+```css
+:root {
+  --brand-primary: #ff6600;
+  --brand-secondary: #0066ff;
+  --spacing-lg: 2rem;
+}
+```
+
+You'll get completions when typing `var(--brand-` in any CSS, SCSS, Less, HTML, TSX, JSX, or Vue file. Hover over any custom property to see its resolved value and source file.
+
+Changes to your CSS files are picked up automatically — no reload required.
+
 ### Hover Previews
 
-Hover over any `wa-*` class to see its CSS declarations, or any `--wa-*` token to see its resolved value and category.
+Hover over any `wa-*` class to see its CSS declarations, or any `--wa-*` token to see its resolved value and category. Custom properties from your configured files are included as well.
 
 ## Supported Languages
 
@@ -51,10 +79,11 @@ Hover over any `wa-*` class to see its CSS declarations, or any `--wa-*` token t
 
 ## Configuration
 
-| Setting                  | Default                  | Description                                |
-| ------------------------ | ------------------------ | ------------------------------------------ |
-| `kigumi.enable`          | `true`                   | Enable or disable the extension            |
-| `kigumi.classAttributes` | `["class", "className"]` | Attribute names to provide completions for |
+| Setting                    | Default                  | Description                                                                 |
+| -------------------------- | ------------------------ | --------------------------------------------------------------------------- |
+| `kigumi.enable`            | `true`                   | Enable or disable the extension                                             |
+| `kigumi.classAttributes`   | `["class", "className"]` | Attribute names to provide completions for                                  |
+| `kigumi.customTokenFiles`  | `[]`                     | Glob patterns for CSS files with custom properties to include in IntelliSense |
 
 ## Requirements
 

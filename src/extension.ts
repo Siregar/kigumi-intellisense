@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { Catalog } from './catalog';
+import { scanCustomTokens } from './custom-token-scanner';
 import { ClassCompletionProvider } from './providers/class-completion';
 import { ClassHoverProvider } from './providers/class-hover';
 import { TokenCompletionProvider } from './providers/token-completion';
@@ -43,6 +44,28 @@ export function activate(context: vscode.ExtensionContext) {
     output.appendLine('ERROR: No catalogs found. Run `pnpm generate` then `pnpm compile` to build them.');
   }
 
+  // Load custom tokens from user-configured CSS files
+  const customTokenFilePatterns = config.get<string[]>('customTokenFiles', []);
+  if (customTokenFilePatterns.length > 0) {
+    loadCustomTokens(catalog, customTokenFilePatterns, output).then(() => {
+      output.appendLine(`Custom tokens loaded. Total tokens: ${catalog.tokens.length}`);
+    });
+
+    // Watch for changes in custom token files
+    for (const pattern of customTokenFilePatterns) {
+      const watcher = vscode.workspace.createFileSystemWatcher(pattern);
+      const reload = () => {
+        loadCustomTokens(catalog, customTokenFilePatterns, output).then(() => {
+          output.appendLine(`Custom tokens reloaded. Total tokens: ${catalog.tokens.length}`);
+        });
+      };
+      watcher.onDidChange(reload);
+      watcher.onDidCreate(reload);
+      watcher.onDidDelete(reload);
+      context.subscriptions.push(watcher);
+    }
+  }
+
   const classAttributes = config.get<string[]>('classAttributes', ['class', 'className']);
 
   // Class name completions in markup files
@@ -65,21 +88,22 @@ export function activate(context: vscode.ExtensionContext) {
     );
   }
 
-  // CSS token completions in style files
+  // CSS token completions in style files + markup files (for inline styles / <style> blocks)
   const tokenCompletion = new TokenCompletionProvider(catalog);
-  for (const lang of STYLE_LANGUAGES) {
+  const tokenLanguages = [...STYLE_LANGUAGES, ...MARKUP_LANGUAGES];
+  for (const lang of tokenLanguages) {
     context.subscriptions.push(
       vscode.languages.registerCompletionItemProvider(
         { language: lang, scheme: 'file' },
         tokenCompletion,
-        '-' // Trigger on hyphen for --wa- prefix
+        '-' // Trigger on hyphen for -- prefix
       )
     );
   }
 
-  // CSS token hover in style files
+  // CSS token hover in style files + markup files
   const tokenHover = new TokenHoverProvider(catalog);
-  for (const lang of STYLE_LANGUAGES) {
+  for (const lang of tokenLanguages) {
     context.subscriptions.push(
       vscode.languages.registerHoverProvider({ language: lang, scheme: 'file' }, tokenHover)
     );
@@ -90,4 +114,27 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {
   // Nothing to clean up
+}
+
+async function loadCustomTokens(
+  catalog: Catalog,
+  patterns: string[],
+  output: vscode.OutputChannel
+): Promise<void> {
+  const filePaths: string[] = [];
+
+  for (const pattern of patterns) {
+    try {
+      const uris = await vscode.workspace.findFiles(pattern);
+      for (const uri of uris) {
+        filePaths.push(uri.fsPath);
+      }
+    } catch (err) {
+      output.appendLine(`Warning: Failed to resolve pattern "${pattern}": ${err}`);
+    }
+  }
+
+  const tokens = scanCustomTokens(filePaths);
+  catalog.replaceCustomTokens(tokens);
+  output.appendLine(`Scanned ${filePaths.length} file(s), found ${tokens.length} custom token(s)`);
 }

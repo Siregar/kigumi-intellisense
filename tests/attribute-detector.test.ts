@@ -41,16 +41,12 @@ describe('detectClassContext', () => {
       expect(detectClassContext(doc, new Position(0, 22), defaultAttrs)).toBe('wa-fl');
     });
 
-    it('detects multi-line class attribute (context detected, prefix lost to join space)', () => {
-      // The multi-line strategy joins lines with ' ', so a trailing space
-      // causes lastIndexOf(' ') to return the join space, yielding ''.
-      // This correctly detects being inside a class attr (non-null), but
-      // the partial prefix is lost. Still useful: completion triggers with all items.
+    it('detects multi-line class attribute with partial prefix', () => {
       const doc = createMockDocument([
         '<div className="',
         '  wa-fl',
       ]);
-      expect(detectClassContext(doc, new Position(1, 7), defaultAttrs)).toBe('');
+      expect(detectClassContext(doc, new Position(1, 7), defaultAttrs)).toBe('wa-fl');
     });
 
     it('supports custom classAttributes', () => {
@@ -173,17 +169,24 @@ describe('detectTokenContext', () => {
     });
   });
 
-  describe('false positives (must return null)', () => {
-    it('rejects non-wa custom property', () => {
+  describe('custom properties (non-wa)', () => {
+    it('detects var(--my-custom) partial', () => {
       const doc = createMockDocument(['color: var(--my-custom);']);
-      expect(detectTokenContext(doc, new Position(0, 22))).toBeNull();
+      expect(detectTokenContext(doc, new Position(0, 22))).toBe('--my-custom');
     });
 
-    it('rejects --wa without trailing hyphen', () => {
-      const doc = createMockDocument(['color: var(--wa);']);
-      expect(detectTokenContext(doc, new Position(0, 15))).toBeNull();
+    it('detects var(--brand-primary) partial', () => {
+      const doc = createMockDocument(['background: var(--brand-primar);']);
+      expect(detectTokenContext(doc, new Position(0, 30))).toBe('--brand-primar');
     });
 
+    it('detects bare --custom-var after colon', () => {
+      const doc = createMockDocument([': --custom-spacing-lg;']);
+      expect(detectTokenContext(doc, new Position(0, 21))).toBe('--custom-spacing-lg');
+    });
+  });
+
+  describe('false positives (must return null)', () => {
     it('rejects plain CSS value', () => {
       const doc = createMockDocument(['display: flex;']);
       expect(detectTokenContext(doc, new Position(0, 13))).toBeNull();
@@ -242,12 +245,23 @@ describe('detectTokenAtCursor', () => {
     });
   });
 
-  describe('false positives (must return null)', () => {
-    it('rejects non-wa custom property', () => {
+  describe('custom properties (non-wa)', () => {
+    it('detects non-wa custom property', () => {
       const doc = createMockDocument(['var(--my-custom-var)']);
-      expect(detectTokenAtCursor(doc, new Position(0, 10))).toBeNull();
+      const result = detectTokenAtCursor(doc, new Position(0, 10));
+      expect(result).not.toBeNull();
+      expect(result!.name).toBe('--my-custom-var');
     });
 
+    it('detects --brand-primary in var()', () => {
+      const doc = createMockDocument(['color: var(--brand-primary);']);
+      const result = detectTokenAtCursor(doc, new Position(0, 18));
+      expect(result).not.toBeNull();
+      expect(result!.name).toBe('--brand-primary');
+    });
+  });
+
+  describe('false positives (must return null)', () => {
     it('rejects plain CSS value', () => {
       const doc = createMockDocument(['color: blue;']);
       expect(detectTokenAtCursor(doc, new Position(0, 8))).toBeNull();

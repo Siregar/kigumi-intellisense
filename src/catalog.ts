@@ -57,6 +57,34 @@ export class Catalog {
     return this.tokens.filter((t) => t.name.startsWith(prefix));
   }
 
+  /**
+   * Merge custom tokens into the catalog.
+   * Existing tokens (e.g. --wa-*) are NOT overwritten — custom tokens
+   * are only added if the name does not already exist.
+   */
+  mergeCustomTokens(customTokens: TokenEntry[]): void {
+    for (const token of customTokens) {
+      if (this.tokenMap.has(token.name)) continue;
+      this.tokenMap.set(token.name, token);
+      this.tokens.push(token);
+    }
+  }
+
+  /**
+   * Remove all custom tokens (category === 'custom') from the catalog,
+   * then merge in the new set. Used for live-reload.
+   */
+  replaceCustomTokens(customTokens: TokenEntry[]): void {
+    // Remove existing custom tokens
+    for (let i = this.tokens.length - 1; i >= 0; i--) {
+      if (this.tokens[i].category === 'custom') {
+        this.tokenMap.delete(this.tokens[i].name);
+        this.tokens.splice(i, 1);
+      }
+    }
+    this.mergeCustomTokens(customTokens);
+  }
+
   static load(extensionPath: string): Catalog {
     const dataDir = path.join(extensionPath, 'out', 'data');
     const utilitiesPath = path.join(dataDir, 'wa-utilities.json');

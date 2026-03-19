@@ -71,6 +71,69 @@ describe('Catalog', () => {
     });
   });
 
+  describe('mergeCustomTokens', () => {
+    it('adds new custom tokens', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+      ]);
+      expect(cat.getToken('--brand-primary')).toBeDefined();
+      expect(cat.getToken('--brand-primary')!.value).toBe('#ff6600');
+    });
+
+    it('does not overwrite existing wa- tokens', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--wa-color-blue', category: 'custom', value: 'overwritten', description: '', group: 'theme.css' },
+      ]);
+      expect(cat.getToken('--wa-color-blue')!.value).toBe('#3b82f6');
+    });
+
+    it('custom tokens appear in filterTokens', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+      ]);
+      const results = cat.filterTokens('--brand');
+      expect(results).toHaveLength(1);
+      expect(results[0].name).toBe('--brand-primary');
+    });
+
+    it('filterTokens with empty prefix includes custom tokens', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+      ]);
+      expect(cat.filterTokens('')).toHaveLength(4); // 3 original + 1 custom
+    });
+  });
+
+  describe('replaceCustomTokens', () => {
+    it('replaces custom tokens on reload', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--old-token', category: 'custom', value: 'old', description: '', group: 'old.css' },
+      ]);
+      expect(cat.getToken('--old-token')).toBeDefined();
+
+      cat.replaceCustomTokens([
+        { name: '--new-token', category: 'custom', value: 'new', description: '', group: 'new.css' },
+      ]);
+      expect(cat.getToken('--old-token')).toBeUndefined();
+      expect(cat.getToken('--new-token')).toBeDefined();
+    });
+
+    it('preserves built-in wa- tokens after replace', () => {
+      const cat = createTestCatalog();
+      cat.mergeCustomTokens([
+        { name: '--custom', category: 'custom', value: 'val', description: '', group: 'test.css' },
+      ]);
+      cat.replaceCustomTokens([]);
+      expect(cat.getToken('--wa-color-blue')).toBeDefined();
+      expect(cat.filterTokens('')).toHaveLength(3); // only original tokens
+    });
+  });
+
   describe('Catalog.load', () => {
     beforeEach(() => {
       mockExistsSync.mockReset();

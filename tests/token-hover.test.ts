@@ -36,4 +36,26 @@ describe('TokenHoverProvider', () => {
     expect(md).toContain('**--wa-color-red**');
     expect(md).toContain('#ef4444');
   });
+
+  describe('custom tokens', () => {
+    it('returns hover for custom token', () => {
+      const customCatalog = createTestCatalog();
+      customCatalog.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+      ]);
+      const customProvider = new TokenHoverProvider(customCatalog);
+      const doc = createMockDocument(['color: var(--brand-primary);']);
+      const hover = customProvider.provideHover(doc, new Position(0, 18));
+      expect(hover).not.toBeNull();
+      const md = hoverMarkdown(hover!);
+      expect(md).toContain('**--brand-primary**');
+      expect(md).toContain('#ff6600');
+      expect(md).toContain('custom / theme.css');
+    });
+
+    it('returns null for unknown custom token', () => {
+      const doc = createMockDocument(['color: var(--unknown-custom);']);
+      expect(provider.provideHover(doc, new Position(0, 18))).toBeNull();
+    });
+  });
 });

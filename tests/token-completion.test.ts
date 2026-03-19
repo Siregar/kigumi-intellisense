@@ -46,6 +46,35 @@ describe('TokenCompletionProvider', () => {
     });
   });
 
+  describe('custom tokens', () => {
+    it('completes custom tokens in var() context', () => {
+      const customCatalog = createTestCatalog();
+      customCatalog.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+        { name: '--brand-secondary', category: 'custom', value: '#0066ff', description: '', group: 'theme.css' },
+      ]);
+      const customProvider = new TokenCompletionProvider(customCatalog);
+      const doc = createMockDocument(['color: var(--brand-);']);
+      const items = customProvider.provideCompletionItems(doc, new Position(0, 19));
+      expect(items).not.toBeNull();
+      const brand = items!.find((i) => i.label === '--brand-primary');
+      expect(brand).toBeDefined();
+      expect(brand!.kind).toBe(CompletionItemKind.Variable);
+    });
+
+    it('shows custom token detail with category and group', () => {
+      const customCatalog = createTestCatalog();
+      customCatalog.mergeCustomTokens([
+        { name: '--brand-primary', category: 'custom', value: '#ff6600', description: '', group: 'theme.css' },
+      ]);
+      const customProvider = new TokenCompletionProvider(customCatalog);
+      const doc = createMockDocument(['color: var(--brand-);']);
+      const items = customProvider.provideCompletionItems(doc, new Position(0, 19));
+      const brand = items!.find((i) => i.label === '--brand-primary');
+      expect(brand!.detail).toBe('custom - theme.css');
+    });
+  });
+
   describe('no context', () => {
     it('returns null outside token context', () => {
       const doc = createMockDocument(['display: flex;']);
