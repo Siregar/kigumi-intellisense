@@ -1,6 +1,6 @@
 # Kigumi IntelliSense
 
-Autocomplete and hover previews for `wa-*` utility classes and `--wa-*` design tokens in [Kigumi](https://kigumi.style) projects.
+Unofficial [Web Awesome](https://webawesome.com) IntelliSense extension. Autocomplete and hover previews for `wa-*` utility classes and `--wa-*` design tokens in [Kigumi](https://kigumi.style) projects.
 
 ## Features
 
