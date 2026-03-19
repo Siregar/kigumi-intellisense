@@ -1,6 +1,6 @@
 # Kigumi IntelliSense
 
-Unofficial [Web Awesome](https://webawesome.com) IntelliSense extension. Autocomplete and hover previews for `wa-*` utility classes and `--wa-*` design tokens in [Kigumi](https://kigumi.style) projects.
+Your companion for [Kigumi](https://kigumi.style) projects. Autocomplete and hover previews for `wa-*` utility classes and `--wa-*` design tokens in your projects.
 
 ## Features
 
@@ -40,21 +40,23 @@ Hover over any `wa-*` class to see its CSS declarations, or any `--wa-*` token t
 
 ## Supported Languages
 
-| Type   | Languages                                    |
-|--------|----------------------------------------------|
+| Type   | Languages                                          |
+| ------ | -------------------------------------------------- |
 | Markup | HTML, React (TSX/JSX), TypeScript, JavaScript, Vue |
-| Styles | CSS, SCSS, Less                              |
+| Styles | CSS, SCSS, Less                                    |
 
 ## Configuration
 
 | Setting                  | Default                  | Description                                |
-|--------------------------|--------------------------|--------------------------------------------|
+| ------------------------ | ------------------------ | ------------------------------------------ |
 | `kigumi.enable`          | `true`                   | Enable or disable the extension            |
 | `kigumi.classAttributes` | `["class", "className"]` | Attribute names to provide completions for |
 
 ## Requirements
 
-Works with any project using Kigumi components. Install via the [Kigumi CLI](https://kigumi.style):
+Works with any project using Kigumi components or [Web Awesome](https://webawesome.com).
+
+### Install via the [Kigumi CLI](https://kigumi.style):
 
 ```bash
 npx kigumi init
