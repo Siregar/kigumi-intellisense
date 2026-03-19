@@ -1,8 +1,12 @@
 # Changelog
 
-## 0.1.1
+## 0.1.2
 
 - Improved README: updated code snippets and added a more comprehensive usage example
+
+## 0.1.1
+
+- Add extension icon
 
 ## 0.1.0
 
