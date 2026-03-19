@@ -1,43 +1,48 @@
 # Kigumi IntelliSense
 
-Autocomplete and hover previews for [Web Awesome](https://webawesome.com) CSS classes and design tokens.
+Autocomplete and hover previews for `wa-*` utility classes and `--wa-*` design tokens in [Kigumi](https://kigumi.style) projects.
 
 ## Features
 
 ### Class Name Completions
 
-Autocomplete for `wa-*` utility classes inside `class` and `className` attributes. Start typing and matching classes appear instantly.
+Type `wa-` inside any `class` or `className` attribute to get completions with CSS previews.
 
 ```html
 <div class="wa-stack wa-gap-m">
-<!--                   ^ completions for wa-gap-* -->
+  <wa-card class="wa-padding-l wa-surface-raised">
+    <h2 class="wa-text-xl wa-font-semibold">Dashboard</h2>
+  </wa-card>
+</div>
 ```
 
 ```tsx
-<WaCard className="wa-padding-l wa-text-center">
-<!--                               ^ completions for wa-text-* -->
+<WaCard className="wa-padding-l wa-surface-raised">
+  <p className="wa-text-s wa-color-neutral">No results found.</p>
+</WaCard>
 ```
 
 ### CSS Token Completions
 
-Autocomplete for `--wa-*` CSS custom properties inside `var()` expressions. Includes token descriptions and resolved values.
+Type `--wa-` inside `var()` to get token completions with resolved values.
 
 ```css
-.my-component {
+.card-header {
+  padding: var(--wa-space-m);
   color: var(--wa-color-text-normal);
-  /*                ^ completions for --wa-color-* */
+  border-bottom: 1px solid var(--wa-color-border-normal);
 }
 ```
 
 ### Hover Previews
 
-Hover over any `wa-*` class name to see its CSS declarations, or any `--wa-*` token to see its resolved value.
+Hover over any `wa-*` class to see its CSS declarations, or any `--wa-*` token to see its resolved value and category.
 
 ## Supported Languages
 
 | Type   | Languages                                    |
 |--------|----------------------------------------------|
-| Markup | HTML, TypeScript, JavaScript, React (TSX/JSX), Vue |
+| Markup | HTML, React (TSX/JSX), TypeScript, JavaScript, Vue |
 | Styles | CSS, SCSS, Less                              |
 
 ## Configuration
@@ -49,9 +54,12 @@ Hover over any `wa-*` class name to see its CSS declarations, or any `--wa-*` to
 
 ## Requirements
 
-- [Web Awesome](https://webawesome.com) CSS loaded in your project
-- Works best with the [Kigumi CLI](https://kigumi.style) for generating component wrappers
+Works with any project using Kigumi components. Install via the [Kigumi CLI](https://kigumi.style):
+
+```bash
+npx kigumi init
+```
 
 ## License
 
-See [LICENSE.md](LICENSE.md).
+[MIT](LICENSE.md)
