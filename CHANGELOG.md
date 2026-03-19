@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- Improved README: updated code snippets and added a more comprehensive usage example
+
 ## 0.1.0
 
 Initial release.
